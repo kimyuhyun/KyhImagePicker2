@@ -39,7 +39,7 @@ class MainActivity : AppCompatActivity() {
                     }
                 }
 
-                // KyhImagePicker2.deleteCroppedImage(this@MainActivity, result)
+                 KyhImagePicker2.deleteCroppedImage(this@MainActivity, result)
             }
         }
     }
