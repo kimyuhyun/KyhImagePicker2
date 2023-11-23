@@ -16,9 +16,9 @@ afterEvaluate {
         publications {
             create<MavenPublication>("mavenJava") {
                 groupId = "com.github.kimyuhyun"
-                artifactId = "kyh_image_picker2"
+                artifactId = "KyhImagePicker2"
                 version = "1.0.0"
-                
+
                 from(components["release"])
             }
         }
