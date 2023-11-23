@@ -1,15 +1,14 @@
 plugins {
     id("com.android.library")
-    id("org.jetbrains.kotlin.android")
+    id("maven-publish")
 
-    // 필수
+    id("org.jetbrains.kotlin.android")
     id("kotlin-parcelize")
     id("kotlin-android")
     id("kotlin-kapt")
 
-    id("maven-publish")
-}
 
+}
 
 afterEvaluate {
     publishing {
@@ -17,13 +16,16 @@ afterEvaluate {
             create<MavenPublication>("mavenJava") {
                 groupId = "com.github.kimyuhyun"
                 artifactId = "KyhImagePicker2"
-                version = "1.0.0"
+                version = "1.0.1"
 
                 from(components["release"])
             }
         }
     }
 }
+
+
+
 
 android {
     namespace = "com.hongslab.kyh_image_picker2"
@@ -47,9 +49,9 @@ android {
         targetCompatibility = JavaVersion.VERSION_17
     }
 
-    kotlinOptions {
-        jvmTarget = "17"
-    }
+//    kotlinOptions {
+//        jvmTarget = "17"
+//    }
 
     buildFeatures {
         viewBinding = true
