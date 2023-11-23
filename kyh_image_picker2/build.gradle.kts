@@ -6,7 +6,24 @@ plugins {
     id("kotlin-parcelize")
     id("kotlin-android")
     id("kotlin-kapt")
+
+    id("maven-publish")
 }
+
+group = "com.github.kimyuhyun"
+//
+//afterEvaluate {
+//    publishing {
+//        publications {
+//            mavenJava(MavenPublication) {
+//                from components.release
+//                groupId = "com.github.kimyuhyun"
+//                artifactId = "KyhImagePicker2"
+//                version = "1.0.0"
+//            }
+//        }
+//    }
+//}
 
 android {
     namespace = "com.hongslab.kyh_image_picker2"
