@@ -8,6 +8,7 @@ data class ImageVO(
     var seq: Int = -1,
     var id: Long? = null,
     var uri: Uri? = null,
+    var thumb: Bitmap? = null,
     var path: String? = null,
     var isToggle: Boolean = false,
     var isChoose: Boolean = false,

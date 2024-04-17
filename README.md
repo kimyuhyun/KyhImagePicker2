@@ -17,7 +17,7 @@ dependencyResolutionManagement {
 
 ```
 dependencies {
-    implementation ("com.github.kimyuhyun:KyhImagePicker2:1.0.1")
+    implementation ("com.github.kimyuhyun:KyhImagePicker2:1.0.2")
 }
 ```
 

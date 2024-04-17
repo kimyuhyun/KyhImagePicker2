@@ -4,6 +4,7 @@ import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
+import android.os.Build.VERSION_CODES.P
 import android.os.Bundle
 import java.util.ArrayDeque
 import java.util.Deque
@@ -38,22 +39,24 @@ class ProxyAC : Activity() {
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        if (requestCode == 60000 && resultCode == RESULT_OK) {
+        if (requestCode == 60000) {
             val uris: ArrayList<Uri>? = data?.getParcelableArrayListExtra("uris")
             val list = arrayListOf<Uri>()
+            val activityRequest = activityRequestStack?.pop()
+            val listener: OnACResultListener? = activityRequest?.getListener()
             if (uris != null) {
                 for (uri in uris) {
                     list.add(uri)
                 }
-                val activityRequest = activityRequestStack?.pop()
-                val listener: OnACResultListener? = activityRequest?.getListener()
                 listener?.onACResult(list)
                 if (activityRequestStack?.size == 0) {
                     activityRequestStack = null
                 }
+            } else {
+                listener?.onACResult(list)
             }
+            finish()
         }
-        finish()
     }
 
 }

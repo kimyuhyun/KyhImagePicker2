@@ -6,6 +6,7 @@ import android.content.ContentValues
 import android.content.Context
 import android.content.Intent
 import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.graphics.Matrix
 import android.net.Uri
 import android.os.Bundle
@@ -28,7 +29,7 @@ fun getAllPhotos(context: Context, page: Int): ArrayList<ImageVO> {
         MediaStore.Images.ImageColumns.SIZE, // 크기
         MediaStore.Images.ImageColumns.DATE_TAKEN,
         MediaStore.Images.ImageColumns.DATE_ADDED, // 추가된 날짜
-        MediaStore.Images.ImageColumns._ID
+        MediaStore.Images.ImageColumns._ID,
     )
     val resolver = context.contentResolver
 
@@ -39,10 +40,10 @@ fun getAllPhotos(context: Context, page: Int): ArrayList<ImageVO> {
     queryArgs.putInt(ContentResolver.QUERY_ARG_SORT_DIRECTION, ContentResolver.QUERY_SORT_DIRECTION_DESCENDING)
     queryArgs.putString(ContentResolver.QUERY_ARG_SQL_SELECTION, selection)
 
-    val start = page * 80
+    val start = page * 160
     Log.d("####", "start: $start")
     queryArgs.putInt(ContentResolver.QUERY_ARG_OFFSET, start)
-    queryArgs.putInt(ContentResolver.QUERY_ARG_LIMIT, 80)
+    queryArgs.putInt(ContentResolver.QUERY_ARG_LIMIT, 160)
 
     val cursor = resolver.query(
         MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
@@ -69,13 +70,14 @@ fun getAllPhotos(context: Context, page: Int): ArrayList<ImageVO> {
             val name = cursor.getString(nameColumn)
             val size = cursor.getInt(sizeColumn)
             val date = cursor.getString(dateColumn)
-
             val contentUri = ContentUris.withAppendedId(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, id)
+            val thumbnailUri = getThumbnailUri(context, id)
 
             val vo = ImageVO(
                 id = id,
                 path = filePath,
                 uri = contentUri,
+                thumb = thumbnailUri,
             )
             list.add(vo)
         } while (cursor.moveToNext())
@@ -85,6 +87,13 @@ fun getAllPhotos(context: Context, page: Int): ArrayList<ImageVO> {
 
     return list
 }
+
+fun getThumbnailUri(context: Context, id: Long): Bitmap? {
+    val bmpOptions = BitmapFactory.Options()
+    bmpOptions.inSampleSize = 1
+    return MediaStore.Images.Thumbnails.getThumbnail(context.contentResolver, id, MediaStore.Images.Thumbnails.MINI_KIND, bmpOptions)
+}
+
 
 fun exifOrientationToDegrees(exifOrientation: Int): Int {
     return when (exifOrientation) {
