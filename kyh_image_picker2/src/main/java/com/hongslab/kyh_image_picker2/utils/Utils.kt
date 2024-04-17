@@ -40,10 +40,10 @@ fun getAllPhotos(context: Context, page: Int): ArrayList<ImageVO> {
     queryArgs.putInt(ContentResolver.QUERY_ARG_SORT_DIRECTION, ContentResolver.QUERY_SORT_DIRECTION_DESCENDING)
     queryArgs.putString(ContentResolver.QUERY_ARG_SQL_SELECTION, selection)
 
-    val start = page * 160
+    val start = page * 80
     Log.d("####", "start: $start")
     queryArgs.putInt(ContentResolver.QUERY_ARG_OFFSET, start)
-    queryArgs.putInt(ContentResolver.QUERY_ARG_LIMIT, 160)
+    queryArgs.putInt(ContentResolver.QUERY_ARG_LIMIT, 80)
 
     val cursor = resolver.query(
         MediaStore.Images.Media.EXTERNAL_CONTENT_URI,

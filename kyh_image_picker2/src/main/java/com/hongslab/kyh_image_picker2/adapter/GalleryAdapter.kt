@@ -37,7 +37,7 @@ class GalleryAdapter(
             }
 
             Glide.with(context)
-                .load(item.uri)
+                .load(item.path)
                 .thumbnail(0.1f)  // 10% 크기의 썸네일 사용
                 .diskCacheStrategy(DiskCacheStrategy.ALL)
                 .centerCrop()
