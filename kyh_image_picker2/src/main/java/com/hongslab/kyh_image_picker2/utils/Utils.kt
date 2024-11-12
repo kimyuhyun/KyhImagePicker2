@@ -9,6 +9,7 @@ import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.Matrix
 import android.net.Uri
+import android.os.Build
 import android.os.Bundle
 import android.provider.MediaStore
 import android.util.Log
@@ -16,6 +17,7 @@ import androidx.exifinterface.media.ExifInterface
 import com.hongslab.kyh_image_picker2.models.ImageVO
 import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream
+import java.io.File
 import java.io.FileNotFoundException
 import java.io.FileOutputStream
 import java.io.IOException
@@ -145,40 +147,71 @@ class compPopulation : Comparator<ImageVO> {
     }
 }
 
+
 fun saveImage(context: Context, bmp: Bitmap): Uri {
-    val values = ContentValues()
-    values.put(MediaStore.Images.Media.DISPLAY_NAME, "bbiribbabba" + System.currentTimeMillis() + ".png")
-    values.put(MediaStore.Images.Media.MIME_TYPE, "image/*")
-    values.put(MediaStore.Images.Media.IS_PENDING, 1)
-    val contentResolver: ContentResolver = context.contentResolver
-    val collection = MediaStore.Images.Media.getContentUri(MediaStore.VOLUME_EXTERNAL_PRIMARY)
-    val uri = contentResolver.insert(collection, values)
+//    val values = ContentValues()
+//    values.put(MediaStore.Images.Media.DISPLAY_NAME, "bbiribbabba" + System.currentTimeMillis() + ".png")
+//    values.put(MediaStore.Images.Media.MIME_TYPE, "image/*")
+//    values.put(MediaStore.Images.Media.IS_PENDING, 1)
+//    val contentResolver: ContentResolver = context.contentResolver
+//    val collection = MediaStore.Images.Media.getContentUri(MediaStore.VOLUME_EXTERNAL_PRIMARY)
+//    val uri = contentResolver.insert(collection, values)
+//    try {
+//        val pfd = contentResolver.openFileDescriptor(uri!!, "w", null)
+//        if (pfd != null) {
+//            val inputStream = getImageInputStream(bmp)
+//            val strToByte = inputStream?.let { getBytes(it) }
+//            val fos = FileOutputStream(pfd.fileDescriptor)
+//            fos.write(strToByte)
+//            fos.close()
+//            inputStream?.close()
+//            pfd.close()
+//            contentResolver.update(uri, values, null, null)
+//        }
+//    } catch (e: FileNotFoundException) {
+//        e.printStackTrace()
+//    } catch (e: IOException) {
+//        e.printStackTrace()
+//    }
+//    values.clear()
+//    // 파일을 모두 write하고 다른곳에서 사용할 수 있도록 0으로 업데이트를 해줍니다.
+//    values.put(MediaStore.Images.Media.IS_PENDING, 0)
+//    contentResolver.update(uri!!, values, null, null)
+//
+//    //갤러리에 추가
+//    context.sendBroadcast(Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE, uri))
+//
+//    return uri
+
+    /**
+     * 앱 내부 저장소에 저장
+     * 장점:
+     * 갤러리에 표시되지 않음
+     * 다른 앱에서 접근할 수 없음 (보안상 안전)
+     * 구현이 단순함
+     * 주의사항:
+     * 앱 삭제시 저장된 이미지도 함께 삭제됨
+     * 저장 공간이 앱의 할당된 내부 저장소로 제한됨
+     */
+    val folder = File(context.filesDir, "images")
+    if (!folder.exists()) {
+        folder.mkdirs()
+    }
+
+    val fileName = "bbiribbabba_${System.currentTimeMillis()}.png"
+    val file = File(folder, fileName)
+
     try {
-        val pfd = contentResolver.openFileDescriptor(uri!!, "w", null)
-        if (pfd != null) {
-            val inputStream = getImageInputStream(bmp)
-            val strToByte = inputStream?.let { getBytes(it) }
-            val fos = FileOutputStream(pfd.fileDescriptor)
-            fos.write(strToByte)
-            fos.close()
-            inputStream?.close()
-            pfd.close()
-            contentResolver.update(uri, values, null, null)
+        FileOutputStream(file).use { fos ->
+            bmp.compress(Bitmap.CompressFormat.PNG, 100, fos)
+            fos.flush()
         }
-    } catch (e: FileNotFoundException) {
-        e.printStackTrace()
-    } catch (e: IOException) {
+    } catch (e: Exception) {
         e.printStackTrace()
     }
-    values.clear()
-    // 파일을 모두 write하고 다른곳에서 사용할 수 있도록 0으로 업데이트를 해줍니다.
-    values.put(MediaStore.Images.Media.IS_PENDING, 0)
-    contentResolver.update(uri!!, values, null, null)
 
-    //갤러리에 추가
-    context.sendBroadcast(Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE, uri))
+    return Uri.fromFile(file)
 
-    return uri
 }
 
 fun getImageInputStream(bmp: Bitmap): InputStream? {

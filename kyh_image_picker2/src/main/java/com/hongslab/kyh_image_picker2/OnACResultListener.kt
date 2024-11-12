@@ -4,5 +4,5 @@ import android.content.Intent
 import android.net.Uri
 
 interface OnACResultListener {
-    fun onACResult(uris: ArrayList<Uri>)
+    fun onACResult(uris: ArrayList<Uri>?)
 }

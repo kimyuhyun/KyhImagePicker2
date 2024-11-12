@@ -29,17 +29,17 @@ class MainActivity : AppCompatActivity() {
                     .open()
                 Log.d("####", "$result")
 
-                for (i in result.indices) {
-                    when (i) {
-                        0 -> findViewById<ImageView>(R.id.iv_0).setImageURI(result[i])
-                        1 -> findViewById<ImageView>(R.id.iv_1).setImageURI(result[i])
-                        2 -> findViewById<ImageView>(R.id.iv_2).setImageURI(result[i])
-                        3 -> findViewById<ImageView>(R.id.iv_3).setImageURI(result[i])
-                        4 -> findViewById<ImageView>(R.id.iv_4).setImageURI(result[i])
+                if (result != null) {
+                    for (i in result.indices) {
+                        when (i) {
+                            0 -> findViewById<ImageView>(R.id.iv_0).setImageURI(result[i])
+                            1 -> findViewById<ImageView>(R.id.iv_1).setImageURI(result[i])
+                            2 -> findViewById<ImageView>(R.id.iv_2).setImageURI(result[i])
+                            3 -> findViewById<ImageView>(R.id.iv_3).setImageURI(result[i])
+                            4 -> findViewById<ImageView>(R.id.iv_4).setImageURI(result[i])
+                        }
                     }
                 }
-
-                 KyhImagePicker2.deleteCroppedImage(this@MainActivity, result)
             }
         }
     }

@@ -4,10 +4,12 @@ import android.Manifest
 import android.content.ComponentName
 import android.content.ContentResolver
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.database.Cursor
 import android.graphics.BitmapFactory
 import android.graphics.Color
 import android.net.Uri
+import android.os.Build
 import android.os.Bundle
 import android.provider.MediaStore
 import android.text.TextUtils
@@ -18,13 +20,14 @@ import android.view.MenuItem
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.activity.addCallback
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat
 import androidx.core.view.updateLayoutParams
 import androidx.databinding.DataBindingUtil
 import androidx.exifinterface.media.ExifInterface
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.gun0912.tedpermission.coroutine.TedPermission
 import com.hongslab.kyh_image_picker2.adapter.GalleryAdapter
 import com.hongslab.kyh_image_picker2.databinding.ActivityKyhImagePicker2Binding
 import com.hongslab.kyh_image_picker2.models.ImageVO
@@ -87,7 +90,26 @@ class KyhImagePicker2AC : AppCompatActivity() {
             showImage(list[pos])
             adapter.notifyDataSetChanged()
         }
+    }
 
+    private val permissionLauncher = registerForActivityResult(
+        ActivityResultContracts.RequestMultiplePermissions()
+    ) { permissions ->
+        val allGranted = permissions.all { it.value }
+        if (allGranted) {
+            CoroutineScope(Dispatchers.Main).launch {
+                loadGallery()
+                delay(100)
+                showImage(list[0])
+            }
+        } else {
+            // 권한이 거부된 경우 처리
+            Log.d(
+                "####", "Denied permissions: ${
+                    permissions.filterValues { !it }.keys
+                }"
+            )
+        }
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -144,22 +166,6 @@ class KyhImagePicker2AC : AppCompatActivity() {
             }
         }
 
-        CoroutineScope(Dispatchers.Main).launch {
-            val permissionResult =
-                TedPermission
-                    .create()
-                    .setPermissions(
-                        Manifest.permission.READ_MEDIA_IMAGES,
-                    )
-                    .check()
-            Log.d("####", "permissionResult: ${permissionResult.isGranted}")
-            if (permissionResult.isGranted) {
-                loadGallery()
-                delay(100)
-                showImage(list[0])
-            }
-        }
-
         binding.recyclerView.addOnScrollListener(object : RecyclerView.OnScrollListener() {
             override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
                 super.onScrollStateChanged(recyclerView, newState)
@@ -175,6 +181,30 @@ class KyhImagePicker2AC : AppCompatActivity() {
         onBackPressedDispatcher.addCallback(this) {
             finish()
         }
+
+        checkAndRequestPermissions()
+
+//        CoroutineScope(Dispatchers.Main).launch {
+//            val permissions = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+//                // Android 13 (API 33) 이상
+//                listOf(Manifest.permission.READ_MEDIA_IMAGES)
+//            } else {
+//                // Android 8.1 (API 27) ~ Android 12.1
+//                listOf(Manifest.permission.READ_EXTERNAL_STORAGE)
+//            }
+//
+//            val permissionResult = TedPermission
+//                .create()
+//                .setPermissions(*permissions.toTypedArray())
+//                .check()
+//            Log.d("####", "${permissionResult.deniedPermissions}")
+//            Log.d("####", "permissionResult: ${permissionResult.isGranted}")
+//            if (permissionResult.isGranted) {
+//                loadGallery()
+//                delay(100)
+//                showImage(list[0])
+//            }
+//        }
     }
 
 
@@ -315,5 +345,25 @@ class KyhImagePicker2AC : AppCompatActivity() {
         return true
     }
 
+    private fun checkAndRequestPermissions() {
+        val permissions = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            arrayOf(Manifest.permission.READ_MEDIA_IMAGES)
+        } else {
+            arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE)
+        }
 
+        val notGrantedPermissions = permissions.filter {
+            ContextCompat.checkSelfPermission(this, it) != PackageManager.PERMISSION_GRANTED
+        }
+
+        if (notGrantedPermissions.isEmpty()) {
+            CoroutineScope(Dispatchers.Main).launch {
+                loadGallery()
+                delay(100)
+                showImage(list[0])
+            }
+        } else {
+            permissionLauncher.launch(permissions)
+        }
+    }
 }

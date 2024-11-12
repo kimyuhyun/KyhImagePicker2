@@ -16,7 +16,7 @@ afterEvaluate {
             create<MavenPublication>("mavenJava") {
                 groupId = "com.github.kimyuhyun"
                 artifactId = "KyhImagePicker2"
-                version = "1.0.3"
+                version = "1.0.4"
 
                 from(components["release"])
             }
@@ -32,7 +32,7 @@ android {
     compileSdk = 33
 
     defaultConfig {
-        minSdk = 26
+        minSdk = 27
         multiDexEnabled = true
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         consumerProguardFiles("consumer-rules.pro")
@@ -74,5 +74,5 @@ dependencies {
     implementation("com.github.bumptech.glide:glide:4.13.0")
 
     // TedPermission Coroutine
-    implementation("io.github.ParkSangGwon:tedpermission-coroutine:3.3.0")
+//    implementation("io.github.ParkSangGwon:tedpermission-coroutine:3.3.0")
 }

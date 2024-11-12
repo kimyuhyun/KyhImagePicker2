@@ -54,7 +54,7 @@ object KyhImagePicker2 {
         suspend fun open() = suspendCoroutine {
             intent.setClass(context, KyhImagePicker2AC::class.java)
             ProxyAC.startActivityForResult(context, intent, object : OnACResultListener {
-                override fun onACResult(uris: ArrayList<Uri>) {
+                override fun onACResult(uris: ArrayList<Uri>?) {
                     it.resume(uris)
                 }
             })
